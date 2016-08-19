@@ -560,6 +560,20 @@ module JetSpider
       end
     end
 
+    def self.uint32(value)
+      UnsignedInt32.new(value)
+    end
+
+    class UnsignedInt32 < PackedValue
+      def serialize
+        [value].pack('N')
+      end
+
+      # def UnsignedInt32.unpack(value)
+      #   ("\0" + value).unpack('N').first
+      # end
+    end
+
   end
 
 end

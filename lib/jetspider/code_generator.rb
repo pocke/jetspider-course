@@ -425,8 +425,18 @@ module JetSpider
       @asm.string eval(n.value)
     end
 
-    def visit_ArrayNode(n) raise "ArrayNode not implemented"; end
-    def visit_ElementNode(n) raise "ElementNode not implemented"; end
+    def visit_ArrayNode(n)
+      @asm.newarray(0)
+      n.value.each.with_index do |v, idx|
+        @asm.int32 idx
+        visit v
+        @asm.initelem
+      end
+    end
+
+    def visit_ElementNode(n)
+      visit n.value
+    end
 
     def visit_RegexpNode(n) raise "RegexpNode not implemented"; end
 
