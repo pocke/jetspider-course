@@ -355,7 +355,8 @@ module JetSpider
     end
 
     def visit_DotAccessorNode(n)
-      raise NotImplementedError, 'DotAccessorNode'
+      visit n.value
+      @asm.getprop n.accessor
     end
 
     def visit_BracketAccessorNode(n)
