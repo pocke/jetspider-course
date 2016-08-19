@@ -136,6 +136,7 @@ module JetSpider
 
     def visit_OpEqualNode(n)
       visit n.value
+      # XXX: when global
       @asm.setlocal n.left.variable.index
     end
 
@@ -293,7 +294,20 @@ module JetSpider
     end
 
     def visit_PostfixNode(n)
-      raise "PostfixNode not implemented"
+      visit n.operand
+      visit n.operand
+
+      case n.value
+      when '++'
+        @asm.one
+        @asm.add
+      when '--'
+        raise NotImplementedError, 'PostfixNode minux'
+      else
+        raise "#{n.value} is unexpected"
+      end
+
+      @asm.setlocal n.operand.variable.index
     end
 
     def visit_BitwiseNotNode(n) raise "BitwiseNotNode not implemented"; end
