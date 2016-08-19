@@ -86,8 +86,12 @@ module JetSpider
     #
 
     def visit_FunctionCallNode(n)
-      # XXX: name の取得ってこれでいい？
-      @asm.callgname n.value.value
+      if n.value.is_a? RKelly::Nodes::DotAccessorNode
+        visit n.value.value
+        @asm.callprop n.value.accessor
+      else
+        @asm.callgname n.value.value
+      end
       args = n.arguments.value
       args.each do |a|
         visit a
@@ -135,9 +139,18 @@ module JetSpider
     end
 
     def visit_OpEqualNode(n)
-      visit n.value
-      # XXX: when global
-      @asm.setlocal n.left.variable.index
+      case
+      when n.left.is_a?(RKelly::Nodes::DotAccessorNode)
+        # XXX: うまくうごいていない
+        visit n.left.value
+        visit n.value
+        @asm.setprop n.left.accessor
+      when n.left.variable.local?
+        visit n.value
+        @asm.setlocal n.left.variable.index
+      else
+        raise
+      end
     end
 
     def visit_VarStatementNode(n)
