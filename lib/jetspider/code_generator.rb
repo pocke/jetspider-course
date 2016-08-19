@@ -7,6 +7,9 @@ module JetSpider
     def initialize(object_file)
       @object_file = object_file
       @asm = nil
+
+      @block_end_locs = []
+      @block_start_locs = []
     end
 
     def generate_object_file(ast)
@@ -193,12 +196,18 @@ module JetSpider
 
       loc = @asm.location
       end_loc = @asm.lazy_location
+      @block_start_locs.push loc
+      @block_end_locs.push end_loc
+
       visit cond
       @asm.ifeq end_loc
       visit block
       @asm.goto loc
 
       @asm.fix_location end_loc
+
+      @block_start_locs.pop
+      @block_end_locs.pop
     end
 
     def visit_DoWhileNode(n)
@@ -210,11 +219,11 @@ module JetSpider
     end
 
     def visit_BreakNode(n)
-      raise NotImplementedError, 'BreakNode'
+      @asm.goto @block_end_locs.last
     end
 
     def visit_ContinueNode(n)
-      raise NotImplementedError, 'ContinueNode'
+      @asm.goto @block_start_locs.last
     end
 
     def visit_SwitchNode(n) raise "SwitchNode not implemented"; end
