@@ -1,5 +1,6 @@
 require 'jetspider/ast'
 require 'jetspider/exception'
+require 'jetspider/optimizer'
 
 module JetSpider
   class CodeGenerator < AstVisitor
@@ -83,7 +84,6 @@ module JetSpider
 
     def visit_FunctionCallNode(n)
       # XXX: name の取得ってこれでいい？
-      # XXX: ASTを書き換えるようにしたい
       @asm.callgname n.value.value
       args = n.arguments.value
       args.each do |a|
@@ -98,6 +98,7 @@ module JetSpider
       end
       # Function declarations are compiled in other step,
       # we just ignore them while compiling toplevel.
+      @asm.nop
     end
 
     def visit_FunctionExprNode(n) raise "FunctionExprNode not implemented"; end
@@ -227,16 +228,15 @@ module JetSpider
     end
 
     def visit_AddNode(n)
-      # XXX: This approach can't optimize `1 + 2 + 3`
-      if n.left.is_a?(RKelly::Nodes::NumberNode) && n.value.is_a?(RKelly::Nodes::NumberNode)
-        value =n.left.value + n.value.value
-        # XXX
-        @asm.int32 value
-      else
-        visit n.left
-        visit n.value
-        @asm.add
+      n = Optimizer.optimize_AddNode(n)
+      unless n.is_a? RKelly::Nodes::AddNode
+        visit n
+        return
       end
+
+      visit n.left
+      visit n.value
+      @asm.add
     end
 
     def visit_SubtractNode(n)
