@@ -139,15 +139,18 @@ module JetSpider
     end
 
     def visit_VarStatementNode(n)
-      raise NotImplementedError, 'VarStatementNode'
+      n.value.each do |value|
+        visit value
+      end
     end
 
     def visit_VarDeclNode(n)
-      raise NotImplementedError, 'VarDeclNode'
+      visit n.value
+      @asm.setlocal n.variable.index
     end
 
     def visit_AssignExprNode(n)
-      raise NotImplementedError, 'AssignExprNode'
+      visit n.value
     end
 
     # We do not support let, const, with

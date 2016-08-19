@@ -19,6 +19,8 @@ module JetSpider
         value = n.left.value + n.value.value
         return RKelly::Nodes::NumberNode.new(value)
       end
+
+      return n
     end
   end
 end
