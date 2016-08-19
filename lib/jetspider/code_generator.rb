@@ -83,6 +83,7 @@ module JetSpider
 
     def visit_FunctionCallNode(n)
       # XXX: name の取得ってこれでいい？
+      # XXX: ASTを書き換えるようにしたい
       @asm.callgname n.value.value
       args = n.arguments.value
       args.each do |a|
@@ -344,10 +345,20 @@ module JetSpider
     end
 
     def visit_NumberNode(n)
-      if n.value == 1
+      v = n.value
+      case v
+      when 1
         @asm.one
+      when -128..127
+        @asm.int8 v
+      when 0..65535
+        @asm.uint16 v
+      when 0..65535
+        @asm.uint16 v
+      when 0..16777216
+        @asm.uint24 v
       else
-        @asm.int8 n.value
+        @asm.int32 v
       end
     end
 
