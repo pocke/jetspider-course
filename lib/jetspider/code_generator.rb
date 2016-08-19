@@ -126,7 +126,7 @@ module JetSpider
       when var.parameter?
         @asm.getarg var.index
       when var.local?
-        raise NotImplementedError, 'ResolveNode - local'
+        @asm.getlocal var.index
       when var.global?
         @asm.getgname var.name
       else
