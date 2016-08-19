@@ -374,7 +374,7 @@ module JetSpider
     end
 
     def visit_StringNode(n)
-      @asm.string n.value[1..-2]
+      @asm.string eval n.value
     end
 
     def visit_ArrayNode(n) raise "ArrayNode not implemented"; end
