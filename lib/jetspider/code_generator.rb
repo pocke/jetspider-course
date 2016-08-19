@@ -295,7 +295,7 @@ module JetSpider
 
     def visit_PostfixNode(n)
       visit n.operand
-      visit n.operand
+      @asm.dup
 
       case n.value
       when '++'
@@ -308,6 +308,7 @@ module JetSpider
       end
 
       @asm.setlocal n.operand.variable.index
+      @asm.pop
     end
 
     def visit_BitwiseNotNode(n) raise "BitwiseNotNode not implemented"; end
