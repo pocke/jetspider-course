@@ -226,6 +226,7 @@ module JetSpider
     end
 
     def visit_AddNode(n)
+      # XXX: This approach can't optimize `1 + 2 + 3`
       if n.left.is_a?(RKelly::Nodes::NumberNode) && n.value.is_a?(RKelly::Nodes::NumberNode)
         value =n.left.value + n.value.value
         @asm.int8 value
