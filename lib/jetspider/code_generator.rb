@@ -188,7 +188,17 @@ module JetSpider
     end
 
     def visit_WhileNode(n)
-      raise NotImplementedError, 'WhileNode'
+      cond = n.left
+      block = n.value
+
+      loc = @asm.location
+      end_loc = @asm.lazy_location
+      visit cond
+      @asm.ifeq end_loc
+      visit block
+      @asm.goto loc
+
+      @asm.fix_location end_loc
     end
 
     def visit_DoWhileNode(n)
